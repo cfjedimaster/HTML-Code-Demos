@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function getBySel(id) { return document.querySelector(id); }
+
+function invalidHandler(e) {
+	console.log("running invalid");
+	console.log(e.srcElement.id);
+	console.dir(e);
+}
+
+function validHandler(e) {
+	console.log("running valid");
+	console.log(e.srcElement.id);
+}
+
+function init() {
+	getBySel("#field1").addEventListener("invalid",invalidHandler,false);
+	getBySel("#field2").addEventListener("invalid",invalidHandler,false);
+
+	getBySel("#field1").addEventListener("valid",validHandler,false);
+	getBySel("#field2").addEventListener("valid",validHandler,false);
+
+}
+</script>
+<style>
+</style>
+</head>
+<body onload="init()">
+
+<form>
+
+    <p>
+		number, range
+        <input type="number" id="field1" required min="1" max="10"><br/>
+		email
+		<input type="email" id="field2" required ><br/>
+
+    </p>
+
+    <p>
+        <button id="testForm">Test</button>
+    </p>
+</form>
+</body>
+</html>

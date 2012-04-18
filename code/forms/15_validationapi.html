@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function getBySel(id) { return document.querySelector(id); }
+
+function demoForm(e) {
+
+    //clean out any existing
+    var existing = document.querySelectorAll(".results");
+    for(var i=0, len=existing.length; i<len; i++) {
+        existing[i].parentNode.removeChild(existing[i]);
+    }
+
+    var fields = document.querySelectorAll("input");
+    for(var i=0,len=fields.length; i<len; i++) {
+        var thisId = fields[i].id;
+        var s = "<div class='results'>Validity for "+thisId;
+        s += "<table>";
+		//first, call checkValidity as a whole
+		s += "<tr><td><b>VALID:</b></td><td>"+fields[i].checkValidity()+"</td></tr>";
+        for(prop in fields[i].validity) {
+            s += "<tr><td>"+prop+"</td><td>"+fields[i].validity[prop]+"</td></tr>";
+        }
+        s+= "</table></div>";
+        fields[i].insertAdjacentHTML("afterend",s);
+    }
+
+	//check the form as a whole
+	var form = getBySel("#mainForm");
+	var formStatus = getBySel("#formStatus");
+	formStatus.innerHTML = "<p>Form validity as a whole is "+form.checkValidity()+"</p>";
+
+	return false;
+}
+
+function init() {
+    getBySel("#testForm").addEventListener("click",demoForm,false);
+}
+</script>
+<style>
+form { float: left; }
+.results {
+    background-color: #d0d0d0;
+    padding: 5px;
+}
+</style>
+</head>
+<body onload="init()">
+
+<div id="formStatus"></div>
+
+<form id="mainForm">
+    
+    <p>
+        Just required:
+        <input type="text" id="field1" required>
+    </p>
+
+    <p>
+        Email:
+        <input type="email" id="field2" required>
+    </p>
+
+    <p>
+        URL:
+        <input type="url" id="field3" required>
+    </p>
+
+    <p>
+        Number:
+        <input type="number" id="field4" required>
+    </p>
+
+    <p>
+        Number (Min 0):
+        <input type="number" id="field5" required min="0">
+    </p>
+
+    <p>
+        Number (Max 10):
+        <input type="number" id="field6" required max="10">
+    </p>
+
+    <p>
+        Number (Min 1, Max 10):
+        <input type="number" id="field7" required min="1" max="10">
+    </p>
+
+    <p>
+        Number (Min 1, Max 10, Step 2):
+        <input type="number" id="field8" required min="1" max="10" step="2">
+    </p>
+
+    <p>
+        <button id="testForm">Test</button>
+    </p>
+</form>
+</body>
+</html>

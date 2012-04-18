@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+var vid;
+var d;
+var heartbeat;
+
+function init(){
+	vid = document.querySelector("#videoOb");
+	d = document.querySelector("#testDiv");
+	
+	vid.addEventListener("play", function() {
+		console.log("hit play at "+vid.currentTime);
+		heartbeat = setInterval("show()",10);
+	},false);
+
+	//I run when stopped too
+	vid.addEventListener("pause", function() {
+		console.log("hit pause at "+vid.currentTime);
+		clearInterval(heartbeat);
+	},false);
+
+	//Another option to our show interval
+	vid.addEventListener("timeupdate", function() {
+		console.log("playing at "+vid.currentTime);
+	},false);
+
+
+	document.querySelector("#playButton").addEventListener("click", function() {
+		vid.play();
+	},false);
+
+	document.querySelector("#pauseButton").addEventListener("click", function() {
+		vid.pause();
+	},false);
+
+	document.querySelector("#muteButton").addEventListener("click", function() {
+		if(vid.muted) vid.muted=false;
+		else vid.muted=true;
+	},false);
+
+}
+
+function show(){
+	var s = "Duration " + vid.duration +"<br/>";
+	s += "Current " + vid.currentTime + "<br/>";
+	d.innerHTML =  s;
+
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<video controls="true" poster="cfguy.png" id="videoOb">
+	<source src="test_for_ie.m4v" />
+	<source src="test.m4v" />
+	<source src="test.ogg" />
+	Video not supported.
+</video>
+
+<p>	
+<button id="playButton">Play</button>
+<button id="pauseButton">Pause</button>
+<button id="muteButton">Mute</button>
+</p>
+
+<div id="testDiv"></div>
+
+</body>
+</html>

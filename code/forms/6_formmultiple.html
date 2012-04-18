@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script>
+	function supportMultiple() {
+		//do I support input type=file/multiple
+		var el = document.createElement("input");
+
+		return ("multiple" in el);
+	}
+
+	function init() {
+		if(supportMultiple()) {
+			document.querySelector("#multipleFileLabel").setAttribute("style","");
+		}
+	}
+</script>
+</head>
+
+<body onload="init()">
+
+	<form action="" method="post" enctype="multipart/form-data">
+	Normal Text: <input type="text" name="name"><br/>
+	<!-- in my testing, singular allowed for multiple -->
+	URL (singular): <input type="url" name="feed"><br/>
+	URL (multiple): <input type="url" name="feeds" multiple><br/>
+	Email (singular): <input type="email" name="email"><br/>
+	Email (multiple): <input type="email" name="emails" multiple><br/>
+	<span id="multipleFileLabel" style="display:none">Multiple </span>File: <input type="file" name="files" multiple="multiple"><br/>
+	<input type="submit">
+	</form>
+
+</body>
+</html>

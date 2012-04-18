@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+input:required {
+    border-style:solid;
+	border-width:thick;
+}
+input:valid {
+	background-color: #adff2f;
+}
+input:invalid {
+	background-color: #f08080;
+}
+input:out-of-range {
+	background-color: #808080;
+}
+input:in-range {
+	background-color: #8a2be2;
+}
+</style>
+</head>
+<body>
+
+<form id="mainForm">
+
+    <p>
+        Not required, nothing special:
+        <input type="text" id="field0">
+    </p>
+
+    <p>
+        Just required:
+        <input type="text" id="field1" required>
+    </p>
+
+    <p>
+        Email:
+        <input type="email" id="field2" required>
+    </p>
+
+    <p>
+        URL:
+        <input type="url" id="field3" required>
+    </p>
+
+    <p>
+        Number:
+        <input type="number" id="field4" required>
+    </p>
+
+    <p>
+        Number (Min 0):
+        <input type="number" id="field5" required min="0">
+    </p>
+
+    <p>
+        Number (Max 10):
+        <input type="number" id="field6" required max="10">
+    </p>
+
+    <p>
+        Number (Min 1, Max 10):
+        <input type="number" id="field7" required min="1" max="10">
+    </p>
+
+    <p>
+        Number (Min 1, Max 10, Step 2):
+        <input type="number" id="field8" required min="1" max="10" step="2">
+    </p>
+
+</form>
+</body>
+</html>

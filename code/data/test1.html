@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init() {
+	var divs = document.querySelectorAll("div");
+	for(var i=0, len=divs.length; i<len; i++) {
+		divs[i].addEventListener("click", function(e) {
+			console.log(this.getAttribute("data-productid"));
+		},false);
+	}
+}
+</script>
+</head>
+
+<body onload="init()">
+
+	<div data-productid="1">
+	<h1>Product One</h1>
+	<p>
+		This is the text for product 1.
+	</p>
+	</div>
+
+	<div data-productid="2">
+	<h1>Product Two</h1>
+	<p>
+		This is the text for product 2.
+	</p>
+	</div>
+
+	<div data-productid="3">
+	<h1>Product Three</h1>
+	<p>
+		This is the text for product 3.
+	</p>
+	</div>
+
+</body>
+
+</html>

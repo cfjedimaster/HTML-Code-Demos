@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<script type="text/javascript" src="zip/zip.js"></script>
+	<script type="text/javascript" src="zip/deflate.js"></script>
+
+    <script>
+	var resourceURL = "resources.zip";
+	var resourceDIRLOC = "resources";
+	var fileSystem;
+	var resourceDIR;
+
+	function errorHandler(e) {
+	  var msg = '';
+      console.dir(e);
+	  switch (e.code) {
+	    case FileError.QUOTA_EXCEEDED_ERR:
+	      msg = 'QUOTA_EXCEEDED_ERR';
+	      break;
+	    case FileError.NOT_FOUND_ERR:
+	      msg = 'NOT_FOUND_ERR';
+	      break;
+	    case FileError.SECURITY_ERR:
+	      msg = 'SECURITY_ERR';
+	      break;
+	    case FileError.INVALID_MODIFICATION_ERR:
+	      msg = 'INVALID_MODIFICATION_ERR';
+	      break;
+	    case FileError.INVALID_STATE_ERR:
+	      msg = 'INVALID_STATE_ERR';
+	      break;
+	    default:
+	      msg = 'Unknown Error';
+	      break;
+	  };
+
+	  console.log('Error: ' + msg);
+	}
+
+	function fetchResource() {
+		var xhr = new XMLHttpRequest();
+		xhr.responseType="arraybuffer";
+		xhr.open("GET", resourceURL,true);
+		xhr.onload = function(e) {
+			if(this.status == 200) {
+				console.log("The last mod for the zip is "+this.getResponseHeader("Last-Modified"));
+				//store the last mod for this file
+				localStorage["resourceLastModified"] = this.getResponseHeader("Last-Modified");
+
+				var bb = new WebKitBlobBuilder();
+				bb.append(this.response);
+				var blob = bb.getBlob("application/zip");
+
+				zip.workerScriptsPath = "zip/";
+
+				zip.createReader(new zip.BlobReader(blob), function(reader) {
+					console.log("opened zip");
+
+					reader.getEntries(function(entries) {
+
+							entries.forEach(function(entry) {
+								console.log(entry.filename+' '+entry.uncompressedSize);
+								resourceDIR.getFile(entry.filename, {create:true}, function(file) {
+									console.log("Yes, I opened "+file.fullPath);
+									entry.getData(new zip.FileWriter(file), function(e) {
+
+									  }, function(current, total) {
+										// onprogress callback
+									  });
+
+								});
+							});
+
+					});
+				}, function(err) {
+					console.log("zip reader error!");
+					console.dir(err);
+				})
+			}
+		}
+		xhr.send();
+	}
+
+	function init() {
+
+        if(!window.webkitStorageInfo) return;
+
+		window.webkitStorageInfo.requestQuota(window.PERSISTENT, 20*1024*1024, function(grantedBytes) {
+			console.log("I was granted "+grantedBytes+" bytes.");
+			window.webkitRequestFileSystem(window.PERSISTENT, grantedBytes, onInitFs, errorHandler);
+		}, errorHandler);
+
+		function onInitFs(fs) {
+			fileSystem = fs;
+
+			fileSystem.root.getDirectory(fs.root.fullPath + '/' + resourceDIRLOC, {create:true}, function(dir) {
+				resourceDIR = dir;
+
+				//So we have our resource folder. To determine if our copy is in sync, we check localStorage and compare it to the remote file
+				if(localStorage["resourceLastModified"]) {
+					console.log("I had a localStorage value for resourceLastModified, it was "+localStorage["resourceLastModified"]);
+					var xhr = new XMLHttpRequest();
+					xhr.open("HEAD", resourceURL );
+					xhr.onload = function(e) {
+						if(this.status == 200) {
+							if(this.getResponseHeader("Last-Modified") != localStorage["resourceLastModified"]) {
+								fetchResource();
+							} else {
+								console.log("Not fetching the zip, my copy is kosher.");
+							}
+						}
+					}
+					xhr.send();
+				} else {
+					fetchResource();
+				}
+
+			},errorHandler);
+		}
+
+		document.querySelector("#testButton").addEventListener("click", function() {
+            //Attempt to draw our images that exist in the file system
+            //If they exist, we draw from there, if not, we do not display them.
+            var images = ["bobapony.jpg","buy bacon.jpg","cool boba.jpg","chuck-norris.jpg"];
+            for(var i=0, len=images.length; i<len; i++) {
+                var thisImage = images[i];
+                resourceDIR.getFile(thisImage, {create:false}, function(file) {
+                    console.log("In success handler for "+file.name + " " + file.toURL());
+                    document.querySelector("#images").innerHTML += "<img src='"+file.toURL() + "'><br/>";
+                });
+            }
+		}, false);
+	
+	};
+
+    </script>
+</head>
+
+<body onload="init()">
+<button id="testButton">Test</button>
+
+<div id="images"></div>
+
+</body>
+</html>

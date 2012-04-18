@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function getBySel(id) { return document.querySelector(id); }
+
+function demoForm() {
+    var field = getBySel("#field1");
+    var value = field.value;
+    if(value == 'ray') {
+        field.setCustomValidity("Ray is wack!");
+    } else {
+		field.setCustomValidity("");
+	}
+}
+
+function init() {
+    getBySel("#testForm").addEventListener("click",demoForm,false);
+}
+</script>
+<style>
+</style>
+</head>
+<body onload="init()">
+
+<form>
+
+    <p>
+        Just required:
+        <input type="text" id="field1">
+    </p>
+
+    <p>
+        <button id="testForm">Test</button>
+    </p>
+</form>
+</body>
+</html>

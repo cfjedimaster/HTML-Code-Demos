@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+<style scoped>
+	video { -webkit-transform: scaleX(1); }
+	p { text-align: center; }
+</style>
+<script>
+var faceKey = "9a348d36a65e0b8ca3aa010eeb1b395f";
+var faceSecret = "6065c6275fca70d187c0d78e2e94d472";
+
+var fileSystem;
+
+function dataURItoBlob(dataURI, callback) {
+        // convert base64 to raw binary data held in a string
+        // doesn't handle URLEncoded DataURIs
+
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+            byteString = atob(dataURI.split(',')[1]);
+        } else {
+            byteString = unescape(dataURI.split(',')[1]);
+        }
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to an ArrayBuffer
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        // write the ArrayBuffer to a blob, and you're done
+        var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder;
+        var bb = new BlobBuilder();
+        bb.append(ab);
+        return bb.getBlob(mimeString);
+    }
+
+function errorHandler(e) {
+	console.log("Error");
+	console.dir(e);
+}
+
+function init() {
+
+	window.webkitRequestFileSystem(window.TEMPORARY,20*1024*1024, onInitFs, errorHandler);
+	function onInitFs(fs) {
+		console.log("Ok, got file system");
+		fileSystem = fs;
+	}
+
+	if (navigator.webkitGetUserMedia) {
+
+		navigator.webkitGetUserMedia('video', gotStream, noStream);
+
+		var video = document.getElementById('monitor');
+		var canvas = document.getElementById('photo');
+
+		function gotStream(stream) {
+
+			video.src = webkitURL.createObjectURL(stream);
+			video.onerror = function () {
+				stream.stop();
+				streamError();
+			};
+			document.getElementById('splash').hidden = true;
+			document.getElementById('app').hidden = false;
+			$("#snapshotbutton").click(snapshot);
+		}
+
+		function noStream() {
+			document.getElementById('errorMessage').textContent = 'No camera available.';
+		}
+
+		function streamError() {
+			document.getElementById('errorMessage').textContent = 'Camera error.';
+		}
+
+		function snapshot() {
+            
+
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+			canvas.getContext('2d').drawImage(video, 0, 0);
+			context = canvas.getContext("2d");
+//			imgdata = canvas.toDataURL("image/jpg");
+			imagedata = context.getImageData(0, 0, canvas.width,canvas.height);
+console.log(imagedata.data.length);
+
+var BlobBuilder = window.MozBlobBuilder || window.WebKitBlobBuilder;
+var bb = new BlobBuilder();
+bb.append(imagedata);
+console.log("ok so far ");
+console.dir(bb.getBlob("image/jpg"));
+var data = canvas.toDataURL('image/jpeg', 0.7);
+newblob = dataURItoBlob(data);
+console.dir(newblob);
+console.log("done");
+				var s = "";
+			     var canvaspixelarray = imagedata.data;
+			     var canvaspixellen = canvaspixelarray.length;
+			     var bytearray = new Uint8Array(canvaspixellen);
+
+			     for (var i=0;i<canvaspixellen;++i) {
+			          bytearray[i] = canvaspixelarray[i];
+					 s+= canvaspixelarray[i];
+			     }
+
+				fileSystem.root.getFile("temp.jpg", {create: true}, function(fileEntry) {
+				    fileEntry.createWriter(function(writer) {
+						 writer.onwriteend = function(e) {
+							 	console.dir(e);
+						        console.log('Write completed.');
+
+					             var formdata = new FormData();
+					             formdata.append("api_key", faceKey);
+					             formdata.append("api_secret", faceSecret);
+					             formdata.append("filename", fileEntry.name);
+					             console.dir(fileEntry);
+					             formdata.append("file",newblob); 
+					         console.dir("about to bitch");
+
+					             $.ajax({
+					                 url: 'http://api.face.com/faces/detect.json',
+					                 data: formdata,
+					                 cache: false,
+					                 contentType: false,
+					                 processData: false,
+					                 type: 'POST',
+					                 complete: function (data) {
+					                     console.log(data);
+					                 },
+					                 success: function (data) {
+					                     console.log(data);
+					                 }
+					             });    
+
+
+					      };
+				        writer.write(newblob);
+				        //writer.write(bytearray);
+				    });
+				});
+
+
+
+
+
+		}
+
+		function testme() {
+			console.log("no way");
+		}
+
+	} else {
+		document.getElementById('errorMessage').textContent = 'No native camera support available.';
+	}
+
+}
+</script>
+</head>
+<body onload="init()">
+
+
+<h1>Webkit WebRTC Video Element Demo</h1>
+<section id="splash">
+	<p id="errorMessage">Loading...</p>
+</section>
+<section id="app" hidden>
+	<p><video id="monitor" autoplay></video> <canvas id="photo"></canvas></p>
+	<p><input value="say cheese!" type=button value="&#x1F4F7;" id="snapshotbutton">
+</section>
+
+<input type="file" id="fileToUpload">
+
+<p>
+Credit: http://miernicki.com/cam.html
+</p>
+
+</body>
+</html>

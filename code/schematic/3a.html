@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Schematic Test</title>
+<script>
+var mypercDOM;
+var myprogDOM;
+
+function init() {
+	mypercDOM = document.getElementById("myperc");
+	myprogDOM = document.getElementById("myprog");
+	setInterval("updatePerc()",1000);
+}
+
+function updatePerc() {
+	var newnum = Math.floor((Math.random() * 100)+1);
+	mypercDOM.innerText = newnum;
+	myprogDOM.value = newnum;
+	//console.log(mypercDOM.innerText);
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<p>
+The progress of the new Death Star is <progress max="100" value="75" id="myprog"><span id="myperc">75</span></progress>% done.
+</p>
+
+
+</body>
+</html>

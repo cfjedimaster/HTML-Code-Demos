@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function getBySel(id) { return document.querySelector(id); }
+
+function failure() {
+    getBySel("#status").innerHTML = "Sorry, something went wrong.";    
+}
+
+function success(stream) {
+    console.dir(stream);
+    var audio = getBySel('#audioItem');
+    audio.src = window.webkitURL.createObjectURL(stream);
+
+       audio.onloadedmetadata = function(e) {
+           console.log("here");
+       };
+}
+function init() {
+    if(navigator.webkitGetUserMedia) {
+        navigator.webkitGetUserMedia("audio", success, failure);
+    } else {
+        getBySel("#status").innerHTML = "Your browser is the suck.";
+    }
+}
+</script>
+<style>
+</style>
+</head>
+<body onload="init()">
+
+<audio id="audioItem"></audio>
+<div id="status"></div>
+</body>
+</html>

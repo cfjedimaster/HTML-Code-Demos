@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>File API Test 1</title>
+<script>
+var fileSystem;
+
+function errorHandler(e) {
+  var msg = '';
+
+  switch (e.code) {
+	case FileError.QUOTA_EXCEEDED_ERR:
+	  msg = 'QUOTA_EXCEEDED_ERR';
+	  break;
+	case FileError.NOT_FOUND_ERR:
+	  msg = 'NOT_FOUND_ERR';
+	  break;
+	case FileError.SECURITY_ERR:
+	  msg = 'SECURITY_ERR';
+	  break;
+	case FileError.INVALID_MODIFICATION_ERR:
+	  msg = 'INVALID_MODIFICATION_ERR';
+	  break;
+	case FileError.INVALID_STATE_ERR:
+	  msg = 'INVALID_STATE_ERR';
+	  break;
+	default:
+	  msg = 'Unknown Error';
+	  break;
+  };
+
+  console.log('Error: ' + msg);
+}
+
+function usageCallback(usage,quota) {
+	console.log("You are using "+usage+" bytes and have a max of "+quota);
+}
+
+function listFiles() {
+	var dirReader = fileSystem.root.createReader();
+	dirReader.readEntries(function(entries) {
+		console.dir(entries);
+
+	}, errorHandler);
+}
+
+function onInitFs(f){
+	console.dir(f);
+	fileSystem = f;
+
+	listFiles();
+}
+function init() {
+	console.log("Start up...");
+
+	//Just for debugging
+	webkitStorageInfo.queryUsageAndQuota(
+	    webkitStorageInfo.PERSISTENT,
+	    usageCallback,
+	    errorHandler);
+
+	window.webkitStorageInfo.requestQuota(window.PERSISTENT, 20*1024*1024, function(grantedBytes) {
+		console.log(grantedBytes);
+	  window.webkitRequestFileSystem(window.PERSISTENT, grantedBytes, onInitFs, errorHandler);
+	}, errorHandler);
+
+	document.querySelector('#myfiles').onchange = function(e) {
+		var files = this.files;
+
+	    for (var i = 0, file; file = files[i]; ++i) {
+
+	      // Capture current iteration's file in local scope for the getFile() callback.
+	      (function(f) {
+	        fileSystem.root.getFile(file.name, {create: true, exclusive: false}, function(fileEntry) {
+	          fileEntry.createWriter(function(fileWriter) {
+	            fileWriter.write(f); // Note: write() can take a File or Blob object.
+				console.log("writing");
+	          }, errorHandler);
+	        }, errorHandler);
+	      })(file);
+
+	    }
+
+	}
+
+}
+
+</script>
+</head>
+
+<body onload="init()">
+
+<input type="file" id="myfiles" multiple>
+
+</body>
+</html>

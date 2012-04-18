@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Super Awesome Face Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../bootstrap/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body onload="init()">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Super Awesome Face Demo</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+<style>
+video { width: 40%; }
+canvas { width: 40%; }
+</style>
+<script>
+var faceKey = "9a348d36a65e0b8ca3aa010eeb1b395f";
+var faceSecret = "6065c6275fca70d187c0d78e2e94d472";
+
+//credit http://stackoverflow.com/a/8782422/52160
+function dataURItoBlob(dataURI, callback) {
+        // convert base64 to raw binary data held in a string
+        // doesn't handle URLEncoded DataURIs
+
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+            byteString = atob(dataURI.split(',')[1]);
+        } else {
+            byteString = unescape(dataURI.split(',')[1]);
+        }
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to an ArrayBuffer
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        // write the ArrayBuffer to a blob, and you're done
+        var BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder;
+        var bb = new BlobBuilder();
+        bb.append(ab);
+        return bb.getBlob(mimeString);
+}
+
+function errorHandler(e) {
+	console.log("Error");
+	console.dir(e);
+}
+
+function init() {
+
+	if (navigator.webkitGetUserMedia) {
+
+		navigator.webkitGetUserMedia('video', gotStream, noStream);
+
+		var video = document.getElementById('monitor');
+		var canvas = document.getElementById('photo');
+
+		function gotStream(stream) {
+
+			video.src = webkitURL.createObjectURL(stream);
+			video.onerror = function () {
+				stream.stop();
+				streamError();
+			};
+			document.getElementById('splash').hidden = true;
+			document.getElementById('app').hidden = false;
+			$("#snapshotbutton").click(snapshot);
+		}
+
+		function noStream() {
+			document.getElementById('errorMessage').textContent = 'No camera available.';
+		}
+
+		function streamError() {
+			document.getElementById('errorMessage').textContent = 'Camera error.';
+		}
+
+		function snapshot() {
+   			$("#result").html("<p><i>Working hard for the money...</i></p>");
+
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+			canvas.getContext('2d').drawImage(video, 0, 0);
+
+			var data = canvas.toDataURL('image/jpeg', 1.0);
+			newblob = dataURItoBlob(data);
+
+			var formdata = new FormData();
+            formdata.append("api_key", faceKey);
+            formdata.append("api_secret", faceSecret);
+            formdata.append("filename","temp.jpg");
+         
+            formdata.append("file",newblob); 
+
+             $.ajax({
+                 url: 'http://api.face.com/faces/detect.json?attributes=age_est,gender,mood,smiling,glasses',
+                 data: formdata,
+                 cache: false,
+                 contentType: false,
+                 processData: false,
+                 dataType:"json",
+                 type: 'POST',
+                 success: function (data) {
+                     handleResult(data.photos[0]);
+                 }
+
+             });    
+
+		}
+
+		function handleResult(photo) {
+			console.dir(photo);
+			var s = "<h2>Result</h2>";
+			if(photo.tags.length) {
+				var tag = photo.tags[0];
+				s += "<p>";
+				if(tag.attributes.gender) s += "<b>Gender:</b> " + tag.attributes.gender.value + "<br/>";
+				if(tag.attributes.glasses) s += "<b>Glasses:</b> " + tag.attributes.glasses.value + "<br/>";
+				if(tag.attributes.smiling) s += "<b>Smiling:</b> " + tag.attributes.smiling.value + "<br/>";
+				if(tag.attributes.age_est) s += "<b>Age:</b> " + tag.attributes.age_est.value + "<br/>";
+				if(tag.attributes.mood) s += "<b>Mood:</b> " + tag.attributes.mood.value + "<br/>";
+				if(tag.attributes.length == 0) s += "I got something, but the data wasn't clear. Sorry.";
+				s += "</p>";
+			} else {
+				s += "<p>Sorry, I didn't find any faces.</p>";
+			}
+			$("#result").html(s);
+		}
+
+	} else {
+		document.getElementById('errorMessage').textContent = 'No native camera support available.';
+	}
+
+}
+</script>
+
+<section id="splash">
+	<p id="errorMessage"></p>
+</section>
+<section id="app" hidden>
+	<p><video id="monitor" autoplay></video> <canvas id="photo"></canvas></p>
+	<p><input value="say cheese!" type=button value="&#x1F4F7;" id="snapshotbutton">
+</section>
+
+<div id="result"></div>
+
+<p>
+Credit for Video to Canvas: http://miernicki.com/cam.html
+</p>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../bootstrap/js/jquery.js"></script>
+    <script src="../bootstrap/js/bootstrap-transition.js"></script>
+    <script src="../bootstrap/js/bootstrap-alert.js"></script>
+    <script src="../bootstrap/js/bootstrap-modal.js"></script>
+    <script src="../bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="../bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="../bootstrap/js/bootstrap-tab.js"></script>
+    <script src="../bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="../bootstrap/js/bootstrap-popover.js"></script>
+    <script src="../bootstrap/js/bootstrap-button.js"></script>
+    <script src="../bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="../bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="../bootstrap/js/bootstrap-typeahead.js"></script>
+
+  </body>
+</html>

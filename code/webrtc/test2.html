@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Form Validation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../bootstrap/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Form Validation</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+
+      <video id="myuglyface" class="videostream" autoplay></video>
+
+      <h1>Registration</h1>
+
+<form action="" autocomplete="off">
+<label for="username2">Username</label>
+<input id="username2" name="username" pattern="[a-zA-Z0-9]{5,}" title="Minimum 5 letters or numbers."  required>
+
+<label for="password2">Password</label>
+<input id="password2" name="password" type="password" pattern=".{5,}" title="Minimum 5 letters or numbers." required>
+
+<label for="fname">First Name</label>
+<input id="fname" name="fname" type="text" required>
+
+<label for="lname">Last Name</label>
+<input id="lname" name="lname" type="text" required>
+
+<label for="email">Email</label>
+<input id="email" name="email" type="email" required>
+
+<label for="url">Homepage</label>
+<input id="url" name="url" type="url">
+</form>
+
+<p>
+Credit:
+</p>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../bootstrap/js/jquery.js"></script>
+    <script src="../bootstrap/js/bootstrap-transition.js"></script>
+    <script src="../bootstrap/js/bootstrap-alert.js"></script>
+    <script src="../bootstrap/js/bootstrap-modal.js"></script>
+    <script src="../bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="../bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="../bootstrap/js/bootstrap-tab.js"></script>
+    <script src="../bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="../bootstrap/js/bootstrap-popover.js"></script>
+    <script src="../bootstrap/js/bootstrap-button.js"></script>
+    <script src="../bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="../bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="../bootstrap/js/bootstrap-typeahead.js"></script>
+
+    <script>
+    $(document).ready(function() {
+
+        var onFailSoHard = function(e) {
+            console.log('Reeeejected!', e);
+        };
+
+        function hasGetUserMedia() {
+            // Note: Opera builds are unprefixed.
+            return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia || navigator.msGetUserMedia);
+        }
+
+        if (hasGetUserMedia()) {
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            window.URL = window.URL || window.webkitURL;
+            navigator.getUserMedia('video', function(localMediaStream) {
+                var video = $("#myuglyface")[0];
+                video.src = window.URL.createObjectURL(localMediaStream);
+                video.classList.add("deepblur");
+            }, onFailSoHard);
+        }
+
+        allfields = $("input[required]");
+        $("input[required]").on("input", function(e) {
+            if(!hasGetUserMedia()) return;
+            //count number of invalid fields
+            var totalGood = 0;
+            for(var i=0, len=allfields.length; i<len; i++) {
+                if($(allfields[i]).attr("required") && allfields[i].checkValidity()) {
+                    totalGood++;
+                }
+            }
+            console.log(totalGood);
+            var video = $("#myuglyface")[0];
+                video.className = '';
+
+            switch(totalGood) {
+                case 0:
+                video.classList.add("deepblur");
+                break;
+                case 1:
+                video.classList.add("notdeepblur");
+                break;
+                case 2:
+                video.classList.add("lesserblur");
+                break;
+                case 3:
+                video.classList.add("lightblur");
+                break;
+                default:
+
+            }
+        });
+    });
+    </script>
+    <style>
+    #myuglyface {
+        float: right;
+        width: 500px;
+        height: 500px;
+    }
+
+    .deepblur {
+        -webkit-filter: blur(30px) grayscale(1);
+    }
+    .notdeepblur {
+        -webkit-filter: blur(20px) grayscale(0.8);
+    }
+    .lesserblur {
+        -webkit-filter: blur(10px) grayscale(0.6);
+    }
+    .lightblur {
+        -webkit-filter: blur(6px) grayscale(0.4);
+    }
+
+</style>
+
+  </body>
+</html>

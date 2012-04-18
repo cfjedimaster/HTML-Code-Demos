@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Form Validation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../bootstrap/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Form Validation</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+    <style>
+    input:required {
+        border-style:solid;
+        border-width:thick;
+    }
+    input:valid {
+        background-color: #adff2f;
+    }
+    input:invalid {
+        background-color: #f08080;
+    }
+    </style>
+
+      <h1>Login/Registration</h1>
+      <p>Use the forms below to login or register for our service. We promise to email the hell out of you..</p>
+
+
+		<h2>Login</h2>
+		<form action="" autocomplete="off">
+		<label for="username">Username</label>
+		<input id="username" name="username" pattern="[a-zA-Z0-9]{5,}" title="Minimum 5 letters or numbers." required>
+		<!-- Credit: http://stackoverflow.com/questions/5458076/regex-in-new-pattern-attr-for-html5-forms -->
+		<label for="password">Password</label>
+		<input id="password" name="password" type="password" pattern=".{5,}" title="Minimum 5 letters or numbers." required>
+		<p/>
+		<input type="submit" class="btn" value="Login">
+
+		</form>
+
+		<h2>Register</h2>
+		<form action="" autocomplete="off">
+		<label for="username2">Username</label>
+		<input id="username2" name="username" pattern="[a-zA-Z0-9]{5,}" title="Minimum 5 letters or numbers."  required>
+
+		<label for="password2">Password</label>
+		<input id="password2" name="password" type="password" pattern=".{5,}" title="Minimum 5 letters or numbers." required>
+
+		<label for="email">Email</label>
+		<input id="email" name="email" type="email" required>
+
+		<label for="url">Homepage</label>
+		<input id="url" name="url" type="url">
+
+		<p/>
+		<input type="submit" class="btn" value="Register">
+
+		</form>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../bootstrap/js/jquery.js"></script>
+    <script src="../bootstrap/js/bootstrap-transition.js"></script>
+    <script src="../bootstrap/js/bootstrap-alert.js"></script>
+    <script src="../bootstrap/js/bootstrap-modal.js"></script>
+    <script src="../bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="../bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="../bootstrap/js/bootstrap-tab.js"></script>
+    <script src="../bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="../bootstrap/js/bootstrap-popover.js"></script>
+    <script src="../bootstrap/js/bootstrap-button.js"></script>
+    <script src="../bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="../bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="../bootstrap/js/bootstrap-typeahead.js"></script>
+
+  </body>
+</html>
