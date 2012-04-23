@@ -7,13 +7,13 @@ var vid;
 var d;
 var heartbeat;
 
-function init(){
+function init() {
 	vid = document.querySelector("#videoOb");
 	d = document.querySelector("#testDiv");
 	
 	vid.addEventListener("play", function() {
 		console.log("hit play at "+vid.currentTime);
-		heartbeat = setInterval("show()",10);
+		heartbeat = setInterval(show,10);
 	},false);
 
 	//I run when stopped too
