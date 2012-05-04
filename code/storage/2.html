@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+
+function init() {
+
+	if(window.sessionStorage) {
+		console.log("yes, storage enabled");
+		var numHits = sessionStorage["numHits"];
+		if(!numHits) numHits=0;
+		else numHits = parseInt(numHits);
+		numHits++;
+		sessionStorage["numHits"] = numHits;
+		var domItm = document.getElementById("domItem");
+		domItm.innerHTML = "You have visited this site "+numHits +" times.";
+	}
+
+
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<div id="domItem">
+</div>
+
+</body>
+</html>

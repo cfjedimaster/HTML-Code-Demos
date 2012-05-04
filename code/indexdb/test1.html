@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+var db;
+
+// https://developer.mozilla.org/en/IndexedDB/Using_IndexedDB
+var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+
+function init() {
+
+	document.querySelector("#test").addEventListener("click", function() {
+		var transaction = db.transaction(["note"], IDBTransaction.READ_WRITE);  
+
+		transaction.oncomplete = function(event) {
+  			console.log("All done!");
+		};
+
+		transaction.onerror = function(event) {
+		  // Don't forget to handle errors!
+		};
+
+		var objectStore = transaction.objectStore("note");
+		//use put versus add to always write, even if exists
+		var request = objectStore.put({id:2,title:"note 1",body:"this is the body"});
+		request.onsuccess = function(event) {
+			console.log("done with insert");
+		};
+
+
+		objectStore.openCursor().onsuccess = function(event) {  
+		  var cursor = event.target.result;  
+		  if (cursor) {  
+		  	console.log(cursor.key);
+		  	console.dir(cursor.value);
+		    cursor.continue();  
+		  }  
+		  else {  
+		  	console.log("Done with cursor");
+		  }  
+		};  
+
+	});
+
+	var openRequest = indexedDB.open("notes",3);
+
+		//handle setup
+		openRequest.onupgradeneeded = function(e) {
+			console.log("running onupgradeneeded");
+			var thisDb = e.target.result;
+
+			//Create Note
+			if(!thisDb.objectStoreNames.contains("note")) {
+				console.log("I need to make the note objectstore");
+				var objectStore = thisDb.createObjectStore("note", { keyPath: "id" });  
+				objectStore.createIndex("title", "title", { unique: false });
+			}
+
+
+		}
+
+		openRequest.onsuccess = function(e) {
+			db = e.target.result;
+		
+			db.onerror = function(event) {
+			  // Generic error handler for all errors targeted at this database's
+			  // requests!
+			  alert("Database error: " + event.target.errorCode);
+			};
+
+		}
+
+		function displayNotes() {
+			//do nothing for now
+		}
+}
+</script>
+</head>
+
+<body onload="init()">
+
+	<button id="test">Test</button>
+</body>
+</html>

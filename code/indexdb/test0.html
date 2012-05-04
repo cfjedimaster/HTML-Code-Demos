@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+var db;
+
+
+// https://developer.mozilla.org/en/IndexedDB/Using_IndexedDB
+var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+
+function init() {
+
+	var openRequest = indexedDB.open("notes",3);
+
+		//handle setups
+		openRequest.onupgradeneeded = function(e) {
+			console.log("running onupgradeneeded");
+			var thisDb = e.target.result;
+			if(!thisDb.objectStoreNames.contains("note")) {
+				console.log("I need to make the note objectstore");
+				var objectStore = thisDb.createObjectStore("note", { keyPath: "id" });  
+				objectStore.createIndex("title", "title", { unique: false });
+				console.log("I made it the store.");
+//				displayNotes();
+			}
+
+			if(!thisDb.objectStoreNames.contains("booger")) {
+				console.log("I need to make the note objectstore");
+				var objectStore = thisDb.createObjectStore("booger", { keyPath: "id" });  
+				objectStore.createIndex("title", "title", { unique: false });
+				console.log("I made it the store.");
+//				displayNotes();
+			}
+
+		}
+		openRequest.onsuccess = function(e) {
+			db = e.target.result;
+			console.dir(db);
+		
+			db.onerror = function(event) {
+			  // Generic error handler for all errors targeted at this database's
+			  // requests!
+			  alert("Database error: " + event.target.errorCode);
+			};
+
+			console.log("We have a handle to our indexeddb");
+		}
+
+		function displayNotes() {
+			//do nothing for now
+		}
+}
+</script>
+</head>
+
+<body onload="init()">
+
+	<button id="test">Test</button>
+</body>
+</html>

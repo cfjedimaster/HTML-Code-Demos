@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+var db;
+
+// https://developer.mozilla.org/en/IndexedDB/Using_IndexedDB
+var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
+
+$(document).ready(function() {
+
+	var openRequest = indexedDB.open("notes",5);
+
+		//handle setup
+		openRequest.onupgradeneeded = function(e) {
+
+			console.log("running onupgradeneeded");
+			var thisDb = e.target.result;
+
+			//temp delete
+			//thisDb.deleteObjectStore("note");
+
+			//Create Note
+			if(!thisDb.objectStoreNames.contains("note")) {
+				console.log("I need to make the note objectstore");
+				var objectStore = thisDb.createObjectStore("note", { keyPath: "id", autoIncrement:true });  
+				objectStore.createIndex("title", "title", { unique: false });
+			}
+
+
+		}
+
+		openRequest.onsuccess = function(e) {
+			db = e.target.result;
+
+			db.onerror = function(event) {
+			  // Generic error handler for all errors targeted at this database's
+			  // requests!
+			  alert("Database error: " + event.target.errorCode);
+			  console.dir(event.target);
+			};
+
+			displayNotes();
+
+		}
+
+		function displayNotes() {
+
+			var transaction = db.transaction(["note"], IDBTransaction.READ);  
+			var content="<ul>";
+
+			transaction.oncomplete = function(event) {
+	  			console.log("All done!");
+	  			$("#noteList").html(content);
+			};
+
+			transaction.onerror = function(event) {
+			  // Don't forget to handle errors!
+			  console.dir(event);
+			};
+
+			var objectStore = transaction.objectStore("note");
+
+			objectStore.openCursor().onsuccess = function(event) {  
+			  var cursor = event.target.result;  
+			  if (cursor) {  
+			  	content += "<li data-key=\""+cursor.key+"\"><span class=\"label\">"+cursor.value.title+"</span>";
+			  	content += " <a class=\"delete\">[Delete]</a>";
+			  	content +="</li>";
+			    cursor.continue();  
+			  }  
+			  else {  
+			  	content += "</ul>";
+			  	console.log("Done with cursor");
+			  }  
+			};  
+
+		}
+
+		$("#noteList").on("click", "a.delete", function(e) {
+			e.preventDefault();
+			var thisId = $(this).parent().data("key");
+			console.log("delete "+thisId);
+
+			var request = db.transaction(["note"], IDBTransaction.READ_WRITE)  
+			                .objectStore("note")  
+			                .delete(thisId);  
+			request.onsuccess = function(event) {  
+				displayNotes();
+			};  
+
+			return false;
+		});
+
+		$("#noteList").on("click", "li", function() {
+			var thisId = $(this).data("key");
+			var transaction = db.transaction(["note"]);  
+			var objectStore = transaction.objectStore("note");  
+			var request = objectStore.get(thisId);  
+			request.onerror = function(event) {  
+			  console.dir(event);
+			};  
+			request.onsuccess = function(event) {  
+			  var note = request.result;
+			  $("#noteDetail").html("<h2>"+note.title+"</h2><p>"+note.body+"</p>");
+			};  
+		});
+
+		//TEMP TO REMOVE
+		$("#test").click(function() {
+
+			var transaction = db.transaction(["note"], IDBTransaction.READ_WRITE);  
+
+			transaction.oncomplete = function(event) {
+	  			console.log("All done!");
+			};
+
+			transaction.onerror = function(event) {
+			  // Don't forget to handle errors!
+			  console.dir(event);
+			};
+
+			var objectStore = transaction.objectStore("note");
+			//use put versus add to always write, even if exists
+			var request = objectStore.add({title:"note "+Math.floor(Math.random()*1000),body:"this is the body "+Math.floor(Math.random()*1000)});
+
+			request.onsuccess = function(event) {
+				console.log("done with insert");
+				displayNotes();
+			};
+
+		});
+
+});
+
+</script>
+<style>
+#noteList li span.label {
+	cursor:pointer;
+}
+a.delete {
+	color:red;
+	font-size:.6em;
+	cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+	<h2>Notes</h2>
+
+	<div id="noteList"></div>
+	<div id="noteDetail"></div>
+
+	<button id="test">Quickly Add a Note</button>
+</body>
+</html>

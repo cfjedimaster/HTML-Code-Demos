@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+var db;
+
+// https://developer.mozilla.org/en/IndexedDB/Using_IndexedDB
+var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
+
+function init() {
+
+	var openRequest = indexedDB.open("notes",5);
+
+		//handle setup
+		openRequest.onupgradeneeded = function(e) {
+
+			console.log("running onupgradeneeded");
+			var thisDb = e.target.result;
+
+			//temp delete
+			//thisDb.deleteObjectStore("note");
+
+			//Create Note
+			if(!thisDb.objectStoreNames.contains("note")) {
+				console.log("I need to make the note objectstore");
+				var objectStore = thisDb.createObjectStore("note", { keyPath: "id", autoIncrement:true });  
+				objectStore.createIndex("title", "title", { unique: false });
+			}
+
+
+		}
+
+		openRequest.onsuccess = function(e) {
+			db = e.target.result;
+		
+			db.onerror = function(event) {
+			  // Generic error handler for all errors targeted at this database's
+			  // requests!
+			  alert("Database error: " + event.target.errorCode);
+			  console.dir(event.target);
+			};
+
+		}
+
+		function displayNotes() {
+			//do nothing for now
+		}
+
+		//TEMP TO REMOVE
+		document.querySelector("#test").addEventListener("click", function() {
+
+			var transaction = db.transaction(["note"], IDBTransaction.READ_WRITE);  
+
+			transaction.oncomplete = function(event) {
+	  			console.log("All done!");
+			};
+
+			transaction.onerror = function(event) {
+			  // Don't forget to handle errors!
+			  console.dir(event);
+			};
+
+			var objectStore = transaction.objectStore("note");
+			//use put versus add to always write, even if exists
+			var request = objectStore.add({title:"note 1",body:"this is the body "+Math.floor(Math.random()*1000)});
+
+			request.onsuccess = function(event) {
+				console.log("done with insert");
+			};
+
+
+			objectStore.openCursor().onsuccess = function(event) {  
+			  var cursor = event.target.result;  
+			  if (cursor) {  
+			  	console.log(cursor.key);
+			  	console.dir(cursor.value);
+			    cursor.continue();  
+			  }  
+			  else {  
+			  	console.log("Done with cursor");
+			  }  
+			};  
+
+		});
+}
+</script>
+</head>
+
+<body onload="init()">
+
+	<button id="test">Test</button>
+</body>
+</html>

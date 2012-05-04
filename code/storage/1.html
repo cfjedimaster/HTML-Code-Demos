@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+
+function init() {
+
+	if(window.localStorage) {
+		//localStorage.removeItem("numHits");
+		console.log("yes, storage enabled");
+		var numHits = localStorage["numHits"];
+		if(!numHits) numHits=0;
+		else numHits = parseInt(numHits);
+		numHits++;
+		localStorage["numHits"] = numHits;
+		var domItm = document.getElementById("domItem");
+		domItm.innerHTML = "You have visited this site "+numHits +" times.";
+	}
+
+
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<div id="domItem">
+</div>
+
+</body>
+</html>

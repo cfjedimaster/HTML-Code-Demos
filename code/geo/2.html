@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function handleGeo(positionResults) {
+	console.dir(positionResults);
+	results = document.getElementById("results");
+	var s = "";
+	for(key in positionResults.coords) {
+		s += "<b>"+key+"</b>="+positionResults.coords[key]+"<br/>";
+	}
+	s += "Timestamp was "+ (new Date(positionResults.timestamp));
+	document.getElementById("map").src = "http://maps.googleapis.com/maps/api/staticmap?center="+positionResults.coords.latitude+","+positionResults.coords.longitude+"&zoom=14&size=512x512&maptype=roadmap&sensor=false";
+	results.innerHTML=s;
+}
+
+function handleError(positionError) {
+	results = document.getElementById("results");
+	var s = "";
+	s = "<b>Error!</b><br/>";
+	s += "Code was "+positionError.code+"<br/>";
+	s += "Message was "+positionError.message;
+	results.innerHTML=s;	
+}
+
+function init() {
+
+	if(navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(handleGeo,handleError);		
+	}
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<div id="results">
+</div>
+
+<img id="map">
+
+</body>
+</html>
+<!--
+results:
+latitude and longitude: decimal degrees
+altitude: meters above reference ellipsoid
+accuracy and altitudeAccuracy: meters
+heading: degrees clockwise from true north
+speed: meters/sec
+
+error:
+code
+message
+-->
