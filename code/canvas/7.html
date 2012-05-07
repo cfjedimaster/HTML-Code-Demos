@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--
+bezier and quandratic curves
+https://developer.mozilla.org/en/Canvas_tutorial
+
+The difference between these can best be described using the image on the right. 
+A quadratic Bézier curve has a start and an end point (blue dots) and just one control point (red dot) 
+while a cubic Bézier curve uses two control points.
+
+quadraticCurveTo(cp1x, cp1y, x, y) 
+bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
+-->
+
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+
+	// Quadratric curves example
+	ctx.beginPath();
+	ctx.moveTo(75,25);
+	ctx.quadraticCurveTo(25,25,25,62.5);
+	ctx.quadraticCurveTo(25,100,50,100);
+	ctx.quadraticCurveTo(50,120,30,125);
+	ctx.quadraticCurveTo(60,120,65,100);
+	ctx.quadraticCurveTo(125,100,125,62.5);
+	ctx.quadraticCurveTo(125,25,75,25);
+	ctx.stroke();
+
+	var anotheritem = document.getElementById('secondtest');
+	ctx = anotheritem.getContext('2d');
+
+	// Bezier curves example
+	ctx.fillStyle = "#ff0000";
+	ctx.beginPath();
+	ctx.moveTo(75,40);
+	ctx.bezierCurveTo(75,37,70,25,50,25);
+	ctx.bezierCurveTo(20,25,20,62.5,20,62.5);
+	ctx.bezierCurveTo(20,80,40,102,75,120);
+	ctx.bezierCurveTo(110,102,130,80,130,62.5);
+	ctx.bezierCurveTo(130,62.5,130,25,100,25);
+	ctx.bezierCurveTo(85,25,75,37,75,40);
+	ctx.fill();
+	
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+<canvas id="secondtest" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>

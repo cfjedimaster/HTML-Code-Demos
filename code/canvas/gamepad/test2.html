@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+var canvas;
+var ctx;
+var input = {
+	left: false,
+	right: false
+};
+
+var paddleOb = function() {
+
+	this.init = function() {
+		this.speed = 8;
+		this.w = 0.25 * canvas.width;
+		this.h = 20;
+		this.x = 10;
+		this.y = canvas.height - this.h - 10;
+		this.col = "black";
+	}
+
+	this.move = function() {
+		if(input.left) {
+			this.x -= this.speed;
+			if(this.x < 0) this.x=0;
+		}
+		if(input.right) {
+			this.x += this.speed;
+			if((this.x+this.w) > canvas.width) this.x=canvas.width-this.w;
+		}
+	}
+
+	this.draw = function () {
+		draw.rect(this.x, this.y, this.w, this.h,this.col);
+	}
+
+
+}
+
+var draw = {
+	clear: function () {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	},
+
+	rect: function (x, y, w, h, col) {
+		ctx.fillStyle = col;
+		ctx.fillRect(x, y, w, h);
+	},
+
+  circle: function (x, y, radius, col) {
+	  ctx.fillStyle = col;
+	  ctx.beginPath();
+	  ctx.arc(x, y, radius, 0, Math.PI*2, true);
+	  ctx.closePath();
+	  ctx.fill();
+  },
+
+	text: function (str, x, y, size, col) {
+		ctx.font = 'bold ' + size + 'px monospace';
+		ctx.fillStyle = col;
+		ctx.fillText(str, x, y);
+	}
+};
+
+function getById(s) { return document.querySelector(s) };
+
+function init() {
+	window.addEventListener("MozGamepadConnected", gamepadConnected, false);
+}
+
+function axisHandler(e) {
+	//console.dir(e);
+
+	//console.log(e.axis);
+	//if(e.axis == 0) console.log(e.value);
+	if(e.axis == 0) {
+		if(e.value == -1) {input.left=true; input.right=false; }
+		else if(e.value ==1) {input.left=false; input.right=true;}
+		else {input.left=false; input.right=false;}
+	}
+
+}
+
+function gamepadConnected(e) {
+	console.log("got a gamepad");
+    gamepadId = e.gamepad.id;
+	console.dir(e.gamepad);
+
+	canvas = getById("#mainCanvas");
+	canvas.width = 400;
+	canvas.height = 400;
+	ctx = canvas.getContext("2d");
+
+	window.addEventListener("MozGamepadAxisMove", axisHandler, false);
+
+	drawGrid();
+}
+
+function drawGrid() {
+	paddle = new paddleOb();
+	paddle.init();
+
+	function loop() {
+		draw.clear();
+		paddle.draw();
+		paddle.move();
+		window.mozRequestAnimationFrame(loop);
+	}
+
+	//setInterval(loop, 30);
+	window.mozRequestAnimationFrame(loop);
+}
+</script>
+<style>
+#mainCanvas {
+	background-color: #f0f0f0;
+	width:400px;
+	height:400px;
+}
+</style>
+</head>
+<body onload="init()">
+
+<canvas id="mainCanvas"></canvas>
+
+</body>

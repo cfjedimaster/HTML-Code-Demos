@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+	ctx.fillStyle="#a0a0a0";
+	ctx.fillRect(10,10,250,250);
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+
+	var img = new Image();
+	//You can't do stuff with images and Canvas until the image is loaded
+	img.onload = function(){
+		//slicing
+		//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		// First 4 determine the box in the original image
+		// dx, dy - x and y of where to place in the context
+		// dWidth/dheight - scaling
+		ctx.drawImage(img, 0, 0, 50, 50, 250, 250, 100, 100);
+	};
+	img.src = "cfguy.png";
+	
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>

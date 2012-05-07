@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function init() {
+	console.log("init");
+	window.addEventListener("MozGamepadConnected", gamepadConnected, false);
+}
+
+function gamepadConnected(e) {
+	console.log("got a gamepad");
+	var gamepads = document.getElementById("gamepads"),
+    gamepadId = e.gamepad.id;
+	gamepads.innerHTML += " Gamepad Connected (id=" + gamepadId + ")";
+	console.dir(e.gamepad);
+}
+
+</script>
+</head>
+<body onload="init()">
+
+<div id="gamepads"></div>
+</body>

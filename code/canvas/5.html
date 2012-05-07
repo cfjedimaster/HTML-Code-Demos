@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+
+	ctx.beginPath();
+	ctx.moveTo(250, 250);
+	ctx.strokeStyle = "#00ff00";
+
+	for (var i = 1; i < 50; i++) {
+		var x = Math.random()*500;
+		var y = Math.random()*500;
+		ctx.lineTo(x, y);
+		ctx.stroke();
+		ctx.moveTo(x, y);
+	}
+
+		
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>

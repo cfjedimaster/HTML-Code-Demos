@@ -60,9 +60,10 @@ $(document).ready(function() {
 		<article>
 			<h3>Agenda</h3>
 			<ul>
-				<li>HTML5 WTF OMG</li>
+				<li>"HTML5" WTF OMG</li>
 				<li>Shiny New Tags</li>
 				<li>Explosive JavaScript APIs</li>
+        <li>Bleeding Edge CSS</li>
 				<li>Awesome Web Sites</li>
 			</ul>
 			<img src="images/robocop%20unicorn.jpg" style="position:absolute;top:0px;right:0px;">
@@ -401,7 +402,7 @@ $(document).ready(function() {
               <li>NoSQL/Object based persistance</li>
               <li>Much deeper (and therefore more complex) than localStorage.</li>
               <li>Stop using WebSQL - this is the future (whether you like it or not).</li>
-              <li><a href="" target="_new">Super Cool Code Samples</a>
+              <li><a href="code/indexdb" target="_new">Super Cool Code Samples</a>
           </ul>
       </article>
 
@@ -415,16 +416,46 @@ $(document).ready(function() {
           <iframe src="http://caniuse.com/sql-storage/embed/"></iframe>
       </article>
 
-      <article>
+      <style>
+      #testCanvas {
+        position:absolute;
+        top:0px;
+        right:0px;
+      }
+      </style>
+      <script>
+      function doCanvas() {
+        var item = document.getElementById('testCanvas');
+        var ctx = item.getContext('2d');
+        
+        //clear 
+        item.width = item.width;
+
+        ctx.beginPath();
+        ctx.moveTo(50, 50);
+        ctx.strokeStyle = "#00ff00";
+
+        for (var i = 1; i < 50; i++) {
+          var x = Math.random()*250;
+          var y = Math.random()*250;
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.moveTo(x, y);
+        }
+              
+      }
+      </script>
+      <article onslideenter="doCanvas()">
           <h3>Canvas API</h3>
           <ul>
               <li>A tag which acts like, well, a canvas</li>
               <li>Very rich <b>drawing</b> API</li>
               <li>Absolutely no <b>animation</b> API</li>
               <li>Good libraries out there though that mimic it (easeljs.com)</li>
-              <li><a href="" target="_new">Pretty Code Samples</a>
+              <li><a href="code/canvas" target="_new">Pretty Code Samples</a>
           </ul>
           <img src="images/freakycat.png" style="position:absolute;right:20px;bottom:20px; height:350px">
+          <canvas id="testCanvas" width="250" height="250">Your browser is weak</canvas>
       </article>
 
       <article>
@@ -436,7 +467,7 @@ $(document).ready(function() {
           <h3>Offline Support</h3>
           <ul>
               <li>A way to tell the browser what to store for offline use</li>
-              <li>TODO</li>
+              <li>IMO, delicate as fine china in an earthquake</li>
               <li><a href="" target="_new">Pretty Code Samples</a>
           </ul>
           <img src="images/offline.jpg" style="position:absolute;right:20px;bottom:20px; height:350px">

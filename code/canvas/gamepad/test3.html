@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script>
+		var ball;
+		var paddle;
+
+		window.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+
+		$(document).ready(function() {
+
+			function axisHandler(e) {
+				if(e.axis == 0) {
+					if(e.value == -1) {input.left=true; input.right=false; }
+					else if(e.value ==1) {input.left=false; input.right=true;}
+					else {input.left=false; input.right=false;}
+				}
+			}
+
+			function gamepadConnected(e) {
+				console.log("got a gamepad");
+				window.addEventListener("MozGamepadAxisMove", axisHandler, false);
+			}
+
+			function buttonhandler(e){
+				document.location.href='http://www.google.com';
+			}
+
+			window.addEventListener("MozGamepadConnected", gamepadConnected, false);
+
+			/*
+			window.addEventListener("webkitgamepadconnected", gamepadConnected, false);
+			window.addEventListener("gamepadconnected", gamepadConnected, false);
+			window.addEventListener("GamepadConnected", gamepadConnected, false);
+			*/
+
+			window.addEventListener("MozGamepadButtonDown", buttonhandler, false);
+			/*
+			window.addEventListener("MozGamepadButtonUp", buttonhandler, false);
+			window.addEventListener("webkitGamepadButtonDown", buttonhandler, false);
+			window.addEventListener("webkitgamepadbuttondown", buttonhandler, false);
+			window.addEventListener("GamepadButtonDown", buttonhandler, false);
+			window.addEventListener("gamepadbuttondown", buttonhandler, false);
+			*/
+
+			var canvas = $("#gamearea")[0];
+			canvas.width = 400;
+			canvas.height = 400;
+			var score = 0;
+
+			var ctx = canvas.getContext("2d");
+			var input = {
+				left: false,
+				right: false
+			};
+
+			$(window).keydown(function(e) {
+		       switch (e.keyCode) {
+		            case 37: input.left = true; break;
+		            case 39: input.right = true; break;
+		       }
+			});
+
+			$(window).keyup(function(e) {
+		       switch (e.keyCode) {
+		            case 37: input.left = false; break;
+		            case 39: input.right = false; break;
+		       }
+			});
+
+
+		    var draw = {
+		        clear: function () {
+		            ctx.clearRect(0, 0, canvas.width, canvas.height);
+		        },
+
+		        rect: function (x, y, w, h, col) {
+		            ctx.fillStyle = col;
+		            ctx.fillRect(x, y, w, h);
+		        },
+
+		      circle: function (x, y, radius, col) {
+		          ctx.fillStyle = col;
+		          ctx.beginPath();
+		          ctx.arc(x, y, radius, 0, Math.PI*2, true);
+		          ctx.closePath();
+		          ctx.fill();
+		      },
+
+		        text: function (str, x, y, size, col) {
+		            ctx.font = 'bold ' + size + 'px monospace';
+		            ctx.fillStyle = col;
+		            ctx.fillText(str, x, y);
+		        }
+		    };
+
+			var ballOb = function() {
+
+				this.init = function() {
+					this.speed = 10;
+					this.x = 19;
+					this.y = 89;
+					this.w = this.h = 10;
+					this.col = "green";
+					this.xdir = this.ydir = 1;
+				}
+
+				this.move = function() {
+
+					if (this.x < 0 || this.x > (canvas.width-this.w)) this.xdir*=-1;
+					if (this.y < 0 || this.y > (canvas.height-this.h)) this.ydir*=-1;
+
+					this.x += (this.xdir * this.speed);
+				    this.y += (this.ydir * this.speed);
+
+					//handle hitting the edge
+					if(this.x-this.w < 0) { this.x = 0+this.w; this.xdir=1 }
+					if(this.x+this.w > canvas.width) { this.x = canvas.width-this.w; this.xdir= -1 }
+					if(this.y-this.w < 0) { this.y = 0+this.w; this.ydir=1 }
+					if(this.y+this.w > canvas.height) { this.y = canvas.height-this.w; this.ydir=-1; score++ }
+
+					//handle hitting paddle
+					if(this.collides(paddle)) this.ydir = -1;
+				}
+
+				this.draw = function () {
+					draw.circle(this.x, this.y, this.w, this.col);
+				}
+
+				this.collides = function(obj) {
+
+					// this sprite's rectangle
+					this.left = this.x;
+					this.right = this.x + this.w;
+					this.top = this.y;
+					this.bottom = this.y + this.h;
+
+					// other object's rectangle
+					// note: we assume that obj has w, h, w & y properties
+					obj.left = obj.x;
+					obj.right = obj.x + obj.w;
+					obj.top = obj.y;
+					obj.bottom = obj.y + obj.h;
+
+					// determine if not intersecting
+					if (this.bottom < obj.top) { return false; }
+					if (this.top > obj.bottom) { return false; }
+
+					if (this.right < obj.left) { return false; }
+					if (this.left > obj.right) { return false; }
+
+					// otherwise, it's a hit
+					return true;
+				};
+
+
+			}
+
+			var paddleOb = function() {
+
+				this.init = function() {
+					this.speed = 8;
+					this.w = 0.25 * canvas.width;
+					this.h = 20;
+					this.x = 10;
+					this.y = canvas.height - this.h - 10;
+					this.col = "white";
+					//this.xdir = this.ydir = 1;
+				}
+
+				this.move = function() {
+					if(input.left) {
+						this.x -= this.speed;
+						if(this.x < 0) this.x=0;
+					}
+					if(input.right) {
+						this.x += this.speed;
+						if((this.x+this.w) > canvas.width) this.x=canvas.width-this.w;
+					}
+				}
+
+				this.draw = function () {
+					draw.rect(this.x, this.y, this.w, this.h,this.col);
+				}
+
+
+			}
+
+			ball = new ballOb();
+			ball.init();
+
+			paddle = new paddleOb();
+			paddle.init();
+
+			function loop() {
+				draw.clear();
+				ball.move();
+				ball.draw();
+				paddle.draw();
+				paddle.move();
+				draw.text("Misses: "+score, 10, 20, 20, "white");
+				window.requestAnimationFrame(loop);
+			}
+
+			window.requestAnimationFrame(loop);
+		})
+		</script>
+	</head>
+
+	<body>
+		<canvas id="gamearea" style="background:url(brick.jpg)"></canvas>
+		<p>
+		Brick wall picture credit: <a href="http://www.flickr.com/photos/richard_wasserman/5510266273/">Nutch Bicer</a>
+		</p>
+	</body>
+
+</html>

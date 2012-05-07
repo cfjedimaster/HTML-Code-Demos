@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+
+	var img = new Image();
+	//You can't do stuff with images and Canvas until the image is loaded
+	img.onload = function(){
+		ctx.drawImage(img, 0, 0,200,500);
+	};
+	img.src = "cfguy.png";
+	
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>
