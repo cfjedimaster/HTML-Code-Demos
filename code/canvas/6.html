@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script>
+function init(){
+	var item = document.getElementById('test');
+	var ctx = item.getContext('2d');
+	
+	//arc(x, y, radius, startAngle, endAngle, anticlockwise)
+	//anglers are in radians
+	//var radians = (Math.PI/180)*degrees (https://developer.mozilla.org/en/Canvas_tutorial)
+	
+	ctx.beginPath();
+	ctx.arc(250,250, 30, 0, Math.PI*2, true);
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.fillStyle="#ff0000";
+	ctx.arc(50,50, 30, 0, Math.PI*2, true);
+	ctx.fill();
+
+}
+</script>
+<style type="text/css">
+canvas { border: 1px solid black; }
+</style>
+</head>
+
+<body onload="init()">
+
+<h1>Regular Old HTML</h1>
+
+<p>
+Check out my drawings below...
+</p>
+
+<canvas id="test" width="500" height="500">Your browser is weak</canvas>
+
+</body>
+</html>
