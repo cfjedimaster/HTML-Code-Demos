@@ -26,6 +26,7 @@ function handleError(positionError) {
 function init() {
 
 	if(navigator.geolocation) {
+        //Demos options you can pass. You can also do enableHighAccuracy and timeout
 		navigator.geolocation.getCurrentPosition(handleGeo,handleError, {maximumAge: 120000});		
 	}
 }
