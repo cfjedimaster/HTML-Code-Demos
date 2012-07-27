@@ -10,7 +10,9 @@
 		window.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
 
 		$(document).ready(function() {
+			console.log("init");
 
+			//Moz section for gamepad
 			function axisHandler(e) {
 				if(e.axis == 0) {
 					if(e.value == -1) {input.left=true; input.right=false; }
@@ -29,21 +31,9 @@
 			}
 
 			window.addEventListener("MozGamepadConnected", gamepadConnected, false);
-
-			/*
-			window.addEventListener("webkitgamepadconnected", gamepadConnected, false);
-			window.addEventListener("gamepadconnected", gamepadConnected, false);
-			window.addEventListener("GamepadConnected", gamepadConnected, false);
-			*/
-
 			window.addEventListener("MozGamepadButtonDown", buttonhandler, false);
-			/*
-			window.addEventListener("MozGamepadButtonUp", buttonhandler, false);
-			window.addEventListener("webkitGamepadButtonDown", buttonhandler, false);
-			window.addEventListener("webkitgamepadbuttondown", buttonhandler, false);
-			window.addEventListener("GamepadButtonDown", buttonhandler, false);
-			window.addEventListener("gamepadbuttondown", buttonhandler, false);
-			*/
+
+
 
 			var canvas = $("#gamearea")[0];
 			canvas.width = 400;
@@ -195,6 +185,22 @@
 			paddle.init();
 
 			function loop() {
+				//check for gamepad
+				if(navigator.webkitGamepads) {
+					var gamepads = navigator.webkitGamepads;
+					for (var padindex = 0; padindex < gamepads.length; ++padindex) {
+				        var pad = gamepads[padindex];
+				        var i;
+				        if (!pad) continue;
+				        //focus on the first stick
+				        if(pad.axes.length >= 1) {
+				        	var axevalue = pad.axes[0];
+				        	if(axevalue == -1) {input.left=true; input.right=false; }
+							else if(axevalue ==1) {input.left=false; input.right=true;}
+							else {input.left=false; input.right=false;}
+				        }
+				    }
+				}
 				draw.clear();
 				ball.move();
 				ball.draw();
