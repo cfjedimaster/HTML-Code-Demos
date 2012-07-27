@@ -12,121 +12,120 @@ var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
 
 $(document).ready(function() {
 
-	var openRequest = indexedDB.open("notes",5);
+	var openRequest = indexedDB.open("notes",6);
 
-		//handle setup
-		openRequest.onupgradeneeded = function(e) {
+    //handle setup
+    openRequest.onupgradeneeded = function(e) {
 
-			console.log("running onupgradeneeded");
-			var thisDb = e.target.result;
+        console.log("running onupgradeneeded");
+        var thisDb = e.target.result;
 
-			//temp delete
-			//thisDb.deleteObjectStore("note");
+        //temp delete
+        //thisDb.deleteObjectStore("note");
 
-			//Create Note
-			if(!thisDb.objectStoreNames.contains("note")) {
-				console.log("I need to make the note objectstore");
-				var objectStore = thisDb.createObjectStore("note", { keyPath: "id", autoIncrement:true });  
-				objectStore.createIndex("title", "title", { unique: false });
-			}
+        //Create Note
+        if(!thisDb.objectStoreNames.contains("note")) {
+            console.log("I need to make the note objectstore");
+            var objectStore = thisDb.createObjectStore("note", { keyPath: "id", autoIncrement:true });  
+            objectStore.createIndex("title", "title", { unique: false });
+        }
 
 
-		}
+    }
 
-		openRequest.onsuccess = function(e) {
-			db = e.target.result;
+    openRequest.onsuccess = function(e) {
+        db = e.target.result;
 
-			db.onerror = function(event) {
-			  // Generic error handler for all errors targeted at this database's
-			  // requests!
-			  alert("Database error: " + event.target.errorCode);
-			  console.dir(event.target);
-			};
+        db.onerror = function(event) {
+          // Generic error handler for all errors targeted at this database's
+          // requests!
+          alert("Database error: " + event.target.errorCode);
+          console.dir(event.target);
+        };
 
-			displayNotes();
+        displayNotes();
 
-		}
+    }
 
-		function displayNotes() {
+    function displayNotes() {
 
-			var transaction = db.transaction(["note"], IDBTransaction.READ);  
-			var content="<ul>";
+        var transaction = db.transaction(["note"], "readonly");  
+        var content="<ul>";
 
-			transaction.oncomplete = function(event) {
-	  			console.log("All done!");
-	  			$("#noteList").html(content);
-			};
+        transaction.oncomplete = function(event) {
+            console.log("All done!");
+            $("#noteList").html(content);
+        };
 
-			transaction.onerror = function(event) {
-			  // Don't forget to handle errors!
-			  console.dir(event);
-			};
+        transaction.onerror = function(event) {
+          // Don't forget to handle errors!
+          console.dir(event);
+        };
 
-			var objectStore = transaction.objectStore("note");
+        var objectStore = transaction.objectStore("note");
 
-			objectStore.openCursor().onsuccess = function(event) {  
-			  var cursor = event.target.result;  
-			  if (cursor) {  
-			  	content += "<li data-key=\""+cursor.key+"\"><span class=\"label\">"+cursor.value.title+"</span>";
-			  	content += " <a class=\"delete\">[Delete]</a>";
-			  	content +="</li>";
-			    cursor.continue();  
-			  }  
-			  else {  
-			  	content += "</ul>";
-			  	console.log("Done with cursor");
-			  }  
-			};  
+        objectStore.openCursor().onsuccess = function(event) {  
+          var cursor = event.target.result;  
+          if (cursor) {  
+            content += "<li data-key=\""+cursor.key+"\"><span class=\"label\">"+cursor.value.title+"</span>";
+            content += " <a class=\"delete\">[Delete]</a>";
+            content +="</li>";
+            cursor.continue();  
+          }  
+          else {  
+            content += "</ul>";
+            console.log("Done with cursor");
+          }  
+        };  
 
-		}
+    }
 
-		$("#noteList").on("click", "a.delete", function(e) {
-			e.preventDefault();
-			var thisId = $(this).parent().data("key");
-			console.log("delete "+thisId);
+    $("#noteList").on("click", "a.delete", function(e) {
+        e.preventDefault();
+        var thisId = $(this).parent().data("key");
+        console.log("delete "+thisId);
 
-			var request = db.transaction(["note"], IDBTransaction.READ_WRITE)  
-			                .objectStore("note")  
-			                .delete(thisId);  
-			request.onsuccess = function(event) {  
-				displayNotes();
-			};  
+        var request = db.transaction(["note"], "readwrite")  
+                        .objectStore("note")  
+                        .delete(thisId);  
+        request.onsuccess = function(event) {  
+            displayNotes();
+        };  
 
-			return false;
-		});
+        return false;
+    });
 
-		$("#noteList").on("click", "li", function() {
-			var thisId = $(this).data("key");
-			var transaction = db.transaction(["note"]);  
-			var objectStore = transaction.objectStore("note");  
-			var request = objectStore.get(thisId);  
-			request.onerror = function(event) {  
-			  console.dir(event);
-			};  
-			request.onsuccess = function(event) {  
-			  var note = request.result;
-			  $("#noteDetail").html("<h2>"+note.title+"</h2><p>"+note.body+"</p>");
-			};  
-		});
+    $("#noteList").on("click", "li", function() {
+        var thisId = $(this).data("key");
+        var transaction = db.transaction(["note"]);  
+        var objectStore = transaction.objectStore("note");  
+        var request = objectStore.get(thisId);  
+        request.onerror = function(event) {  
+          console.dir(event);
+        };  
+        request.onsuccess = function(event) {  
+          var note = request.result;
+          $("#noteDetail").html("<h2>"+note.title+"</h2><p>"+note.body+"</p>");
+        };  
+    });
 
-		//TEMP TO REMOVE
-		$("#addNoteButton").click(function() {
+    $("#addNoteButton").click(function() {
 
-			var title = $("#title").val();
-			var body = $("#body").val();
-			
-			var request = db.transaction(["note"], IDBTransaction.READ_WRITE)
-							.objectStore("note")
-							.add({title:title,body:body});
+        var title = $("#title").val();
+        var body = $("#body").val();
+        
+        var request = db.transaction(["note"], "readwrite")
+                        .objectStore("note")
+                        .add({title:title,body:body});
 
-			request.onsuccess = function(event) {
-				$("#title").val("");
-				$("#body").val("");
-				displayNotes();
-			};
+        request.onsuccess = function(event) {
+            $("#title").val("");
+            $("#body").val("");
+            displayNotes();
+        };
 
-			return false;
-		});
+        return false;
+    });
 
 });
 
